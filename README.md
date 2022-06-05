@@ -13,6 +13,7 @@ See https://download.nvidia.com/XFree86/Linux-x86_64/515.48.07/README/dynamicpow
 ```
 options nvidia "NVreg_DynamicPowerManagement=0x02"
 ```
+*Currently the nvidia-open driver does not support this feature. However, it works with the proprietary drivers in both X11 and Wayland.*
 
 # gresource-extract.sh
 Extracts gtk resources from a `.gresource` file. This makes the theme usable with libadwaita apps.  
