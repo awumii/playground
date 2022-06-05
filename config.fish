@@ -4,9 +4,9 @@
 set -U fish_greeting
 
 # Building speed improvement
-export PATH="/usr/lib/ccache/bin/:$PATH" # Install ccache package first.
-export MAKEFLAGS="-j12" 		 # Change 12 to the number of your CPU threads.
-export BUILDDIR="/tmp/makepkg"           # Sets makepkg directory to tmpfs (RAM).
+export PATH="/usr/lib/ccache/bin/:$PATH" # Install ccache and follow this: https://wiki.archlinux.org/title/Ccache#Enable_ccache_for_makepkg
+export MAKEFLAGS="-j12" 		             # Change 12 to the number of your CPU threads.
+export BUILDDIR="/tmp/makepkg"           # Sets the makepkg directory to tmpfs (RAM).
 
 # Pacman aliases. Requires yay and pacman-contrib
 alias install="yay -S --needed"
