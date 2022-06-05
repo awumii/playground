@@ -32,3 +32,6 @@ Tested with various themes made by [vinceliuice](https://github.com/vinceliuice)
 5. Re-login and enjoy your themed Qt5 apps.  
 
 *For theming Qt6 apps install qt6ct and repeat the third step, but open qt6ct instead of qt5ct*
+
+# Misc
+https://github.com/mukul29/legacy-theme-auto-switcher-gnome-extension
