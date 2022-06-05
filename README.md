@@ -22,3 +22,12 @@ Tested with various themes made by [vinceliuice](https://github.com/vinceliuice)
 1. Put the script in the `gtk-4.0` directory of your theme.
 2. Run `./gresource-extract.sh`.
 3. Copy all files from the `theme-extracted` directory to `~/.config/gtk-4.0`
+
+# Qt5/Qt6 app theming in GNOME
+1. Install `qt5ct` and `kvantum`.
+2. Set the [environmental variable](https://wiki.archlinux.org/title/Environment_variables) `QT_QPA_PLATFORMTHEME=qt5ct`.
+3. Open Qt5ct and set the style to `kvantum` or `kvantum-dark`.
+4. Download your kvantum theme and install it trough kvantum. Use solid version of the theme if possible.
+5. Re-login and enjoy your themed Qt5 apps.  
+
+*For theming Qt6 apps install qt6ct and repeat the third step, but open qt6ct instead of qt5ct*
