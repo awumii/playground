@@ -1,0 +1,28 @@
+GCAM APK:
+https://www.celsoazevedo.com/files/android/google-camera/dev-hasli/f/dl10/
+
+XML import guide
+
+Open gcam
+
+Tap on 'more settings' option from the viewfinders settings
+
+In the settings menu, go to config settings
+
+Tap the 'save setting' option
+
+Save an empty xml with any name 
+(just for the folder to be created)
+
+The folder named 'LMC8.4' will be created in your internal storage
+
+copy the downloaded xml file to the folder named 'LMC8.4'
+
+Open the gcam and double tap the blank areas outside the shutter button, 
+a pop up will appear
+
+Select the xml which you copied in the folder
+
+tap import... Done!
+
+*The xml files are only work for its corresponding version of gcam
