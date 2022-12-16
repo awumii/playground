@@ -1,0 +1,11 @@
+# Placed in /etc/systemd/system/disable-malfunctioning-usb-port.service
+
+[Unit]
+Description=Disables the malfunctioning usb port on my laptop.
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "echo 0 > /sys/bus/usb/devices/usb1/authorized"
+
+[Install]
+WantedBy=multi-user.target
