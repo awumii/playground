@@ -1,10 +1,3 @@
-# /etc/modprobe.d/blacklist.conf
-Blacklist some unwanted modules
-```
-blacklist pcspkr                  # i hate the beeping
-blacklist uvcvideo                # webcam driver
-```
-
 # /etc/modprobe.d/nvidia.conf
 ```
 options nvidia "NVreg_DynamicPowerManagement=0x02"
