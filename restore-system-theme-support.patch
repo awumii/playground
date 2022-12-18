@@ -1,0 +1,190 @@
+diff --git a/restore-system-theme-support.patch b/restore-system-theme-support.patch
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/src/base/preferences.cpp b/src/base/preferences.cpp
+index 4cc99227c..fba4bc9bc 100644
+--- a/src/base/preferences.cpp
++++ b/src/base/preferences.cpp
+@@ -1,3 +1,15 @@
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++bool Preferences::useSystemIconTheme() const
++{
++    return value(u"Preferences/Advanced/useSystemIconTheme"_qs, false);
++}
++
++void Preferences::useSystemIconTheme(const bool enabled)
++{
++    setValue(u"Preferences/Advanced/useSystemIconTheme"_qs, enabled);
++}
++#endif
++
+ /*
+  * Bittorrent Client using Qt and libtorrent.
+  * Copyright (C) 2014  sledgehammer999 <hammered999@gmail.com>
+@@ -996,6 +1008,18 @@ void Preferences::resolvePeerHostNames(const bool resolve)
+     setValue(u"Preferences/Connection/ResolvePeerHostNames"_qs, resolve);
+ }
+ 
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++bool Preferences::useSystemIconTheme() const
++{
++    return value(u"Preferences/Advanced/useSystemIconTheme"_qs, false);
++}
++
++void Preferences::useSystemIconTheme(const bool enabled)
++{
++    setValue(u"Preferences/Advanced/useSystemIconTheme"_qs, enabled);
++}
++#endif
++
+ bool Preferences::isRecursiveDownloadEnabled() const
+ {
+     return !value(u"Preferences/Advanced/DisableRecursiveDownload"_qs, false);
+diff --git a/src/base/preferences.h b/src/base/preferences.h
+index d22db8df5..8f3ed04c1 100644
+--- a/src/base/preferences.h
++++ b/src/base/preferences.h
+@@ -281,6 +281,10 @@ public:
+     void resolvePeerCountries(bool resolve);
+     bool resolvePeerHostNames() const;
+     void resolvePeerHostNames(bool resolve);
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    bool useSystemIconTheme() const;
++    void useSystemIconTheme(bool enabled);
++#endif
+     bool isRecursiveDownloadEnabled() const;
+     void setRecursiveDownloadEnabled(bool enable);
+ #ifdef Q_OS_WIN
+diff --git a/src/gui/optionsdialog.cpp b/src/gui/optionsdialog.cpp
+index d4068e26a..587cd538e 100644
+--- a/src/gui/optionsdialog.cpp
++++ b/src/gui/optionsdialog.cpp
+@@ -288,6 +288,13 @@ void OptionsDialog::loadBehaviorTabOptions()
+     m_ui->customThemeFilePath->setMode(FileSystemPathEdit::Mode::FileOpen);
+     m_ui->customThemeFilePath->setDialogCaption(tr("Select qBittorrent UI Theme file"));
+     m_ui->customThemeFilePath->setFileNameFilter(tr("qBittorrent UI Theme file (*.qbtheme config.json)"));
++    
++    
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    m_ui->checkUseSystemIcon->setChecked(Preferences::instance()->useSystemIconTheme());
++#else
++    m_ui->checkUseSystemIcon->setVisible(false);
++#endif
+ 
+     m_ui->confirmDeletion->setChecked(pref->confirmTorrentDeletion());
+     m_ui->checkAltRowColors->setChecked(pref->useAlternatingRowColors());
+@@ -384,7 +391,9 @@ void OptionsDialog::loadBehaviorTabOptions()
+ 
+     connect(m_ui->checkUseCustomTheme, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
+     connect(m_ui->customThemeFilePath, &FileSystemPathEdit::selectedPathChanged, this, &ThisType::enableApplyButton);
+-
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    connect(m_ui->checkUseSystemIcon, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
++#endif
+     connect(m_ui->confirmDeletion, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+     connect(m_ui->checkAltRowColors, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+     connect(m_ui->checkHideZero, &QAbstractButton::toggled, m_ui->comboHideZero, &QWidget::setEnabled);
+@@ -454,6 +463,10 @@ void OptionsDialog::saveBehaviorTabOptions() const
+     pref->setUseCustomUITheme(m_ui->checkUseCustomTheme->isChecked());
+     pref->setCustomUIThemePath(m_ui->customThemeFilePath->selectedPath());
+ 
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    pref->useSystemIconTheme(m_ui->checkUseSystemIcon->isChecked());
++#endif
++
+     pref->setConfirmTorrentDeletion(m_ui->confirmDeletion->isChecked());
+     pref->setAlternatingRowColors(m_ui->checkAltRowColors->isChecked());
+     pref->setHideZeroValues(m_ui->checkHideZero->isChecked());
+diff --git a/src/gui/optionsdialog.ui b/src/gui/optionsdialog.ui
+index ea4c73d7f..cba41f76c 100644
+--- a/src/gui/optionsdialog.ui
++++ b/src/gui/optionsdialog.ui
+@@ -175,6 +175,13 @@
+                  </property>
+                 </widget>
+                </item>
++               <item row="2" column="0" colspan="2">
++                <widget class="QCheckBox" name="checkUseSystemIcon">
++                 <property name="text">
++                  <string>Use system icon theme</string>
++                 </property>
++                </widget>
++               </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="comboI18n">
+                  <property name="minimumSize">
+@@ -3611,6 +3618,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</string>
+  <tabstops>
+   <tabstop>tabOption</tabstop>
+   <tabstop>comboI18n</tabstop>
++  <tabstop>checkUseSystemIcon</tabstop>
+   <tabstop>checkUseCustomTheme</tabstop>
+   <tabstop>customThemeFilePath</tabstop>
+   <tabstop>checkStartPaused</tabstop>
+diff --git a/src/gui/uithememanager.cpp b/src/gui/uithememanager.cpp
+index 1253646b4..2d0ca089e 100644
+--- a/src/gui/uithememanager.cpp
++++ b/src/gui/uithememanager.cpp
+@@ -168,6 +168,9 @@ void UIThemeManager::initInstance()
+ 
+ UIThemeManager::UIThemeManager()
+     : m_useCustomTheme(Preferences::instance()->useCustomUITheme())
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    , m_useSystemTheme(Preferences::instance()->useSystemIconTheme())
++#endif
+ {
+     if (m_useCustomTheme)
+     {
+@@ -202,6 +205,17 @@ QIcon UIThemeManager::getIcon(const QString &iconId, const QString &fallback) co
+     const auto iter = m_iconCache.find(iconId);
+     if (iter != m_iconCache.end())
+         return *iter;
++        
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    // Don't cache system icons because users might change them at run time
++    if (m_useSystemTheme)
++    {
++        QIcon icon = QIcon::fromTheme(iconId);
++        if (icon.name() != iconId)
++            icon = QIcon::fromTheme(fallback, QIcon(getIconPathFromResources(iconId, fallback).toString()));
++        return icon;
++    }
++#endif
+ 
+     const QIcon icon {getIconPathFromResources(iconId, fallback).data()};
+     m_iconCache[iconId] = icon;
+@@ -259,6 +273,22 @@ QIcon UIThemeManager::getSystrayIcon() const
+ 
+ Path UIThemeManager::getIconPath(const QString &iconId) const
+ {
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    if (m_useSystemTheme)
++    {
++        Path path = Utils::Fs::tempPath() / Path(iconId + u".png");
++        if (!path.exists())
++        {
++            const QIcon icon = QIcon::fromTheme(iconId);
++            if (!icon.isNull())
++                icon.pixmap(32).save(path.toString());
++            else
++                path = getIconPathFromResources(iconId);
++        }
++
++        return path;
++    }
++#endif
+     return getIconPathFromResources(iconId, {});
+ }
+ 
+diff --git a/src/gui/uithememanager.h b/src/gui/uithememanager.h
+index 3b3c18cde..41989783d 100644
+--- a/src/gui/uithememanager.h
++++ b/src/gui/uithememanager.h
+@@ -81,4 +81,7 @@ private:
+     QHash<QString, QColor> m_colors;
+     mutable QHash<QString, QIcon> m_iconCache;
+     mutable QHash<QString, QIcon> m_flagCache;
++#if (defined(Q_OS_UNIX) && !defined(Q_OS_MACOS))
++    const bool m_useSystemTheme;
++#endif
+ };
